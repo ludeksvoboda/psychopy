@@ -15,6 +15,7 @@ while not event.getKeys('q'):
     circle.draw()
     win.flip(clearBuffer=True)
     time.sleep(2)
+    #send info to video recorder
 
 win.close()
 core.quit()
