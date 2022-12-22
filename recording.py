@@ -1,6 +1,4 @@
-#Prepare new db
-#set the riht image size
-#save the images
+#test if images correspond to the point by making it skip between two points far left and far right
 
 from multiprocessing import Process, Pipe
 import time
@@ -10,6 +8,8 @@ import pygame
 import pygame.camera
 import mysql.connector
 import config
+import numpy as np
+import os
 
 mydb = mysql.connector.connect(
             host="10.0.0.114",
@@ -32,12 +32,13 @@ def screen(child_conn):
         circle.pos = (x,y)
         circle.draw()
         win.flip(clearBuffer=True)
-        time.sleep(2)
+        time.sleep(1.5)
         coordinates = f"POINT({x} {y})"
         query = "INSERT INTO eye_click.recordings(coordinates) " \
                 "VALUES (ST_PointFromText(%(coordinates)s))"
         mycursor.execute(query, {"coordinates": coordinates})
         mydb.commit()
+        print('sending')
         child_conn.send([x, y, mycursor.lastrowid])
         #send info to video recorder
 
@@ -47,14 +48,19 @@ def screen(child_conn):
 def video(parent_conn):
     pygame.init()
     pygame.camera.init()
-    cam = pygame.camera.Camera("/dev/video1", (1024, 768))
+    cam = pygame.camera.Camera("/dev/video1", (640, 480))
     cam.start()
     images = []
-    start = time.time()
 
-    while(time.time() - start < 1):
-        file_num = file_num + 1
-        images.append(cam.get_image())
+    while(True):
+        images.append(pygame.surfarray.array3d(cam.get_image()))
+        if parent_conn.poll():
+                print("poll")
+                save_info = parent_conn.recv()
+                dir_name = '/home/lu/MLData/psychopyEyeClick/'+ str(save_info[2])
+                os.mkdir(dir_name)
+                np.save(dir_name +'/images.npy', images, allow_pickle=True)
+                images = []
 
 if __name__ == '__main__':
     p,q = Pipe()
