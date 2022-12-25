@@ -55,7 +55,7 @@ def video(parent_conn):
     images = []
 
     while(True):
-        images.append(pygame.surfarray.array3d(cam.get_image()))
+        images.append(pygame.surfarray.array3d(cam.get_image()).swapaxes(0,1))
         if parent_conn.poll():
                 save_info = parent_conn.recv()
                 if save_info[3] > 1:
