@@ -1,4 +1,5 @@
-#test if images correspond to the point by making it skip between two points far left and far right
+#test if images correspond to the point by making it skip between two points far left and and center (difference between extreme
+# and center is obvious), save only last image
 
 from multiprocessing import Process, Pipe
 import time
@@ -9,6 +10,13 @@ import pygame.camera
 import mysql.connector
 import config
 import numpy as np
+import os
+import paramiko
+
+top_dir_name = '/home/lu/MLData/psychopyEyeClick/'
+run_no = len(os.listdir(top_dir_name))
+dir_name = top_dir_name + str(run_no)
+os.makedirs(dir_name)
 
 mydb = mysql.connector.connect(
             host="10.0.0.114",
@@ -42,25 +50,34 @@ def screen(child_conn):
         else:
             child_conn.send([0, 0, 0, i])
         i += 1
-
+    child_conn.send(["quit"])
     win.close()
     core.quit()
     
 def video(parent_conn):
     pygame.init()
     pygame.camera.init()
-    cam = pygame.camera.Camera("/dev/video1", (640, 480))
+    cam = pygame.camera.Camera("/dev/video3", (640, 480))
     cam.start()
-    dir_name = '/home/lu/MLData/psychopyEyeClick/'
     images = []
 
     while(True):
         images.append(pygame.surfarray.array3d(cam.get_image()).swapaxes(0,1))
         if parent_conn.poll():
                 save_info = parent_conn.recv()
-                if save_info[3] > 1:
-                    np.save(dir_name +'/images' + str(save_info[2]) + '.npy', images, allow_pickle=True)
-                images = [] 
+                if save_info[0] == "quit":
+                    file_names = os.listdir(dir_name)
+                    ssh = paramiko.SSHClient() 
+                    ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
+                    ssh.connect(config.server, username=config.ssh_username, password=config.ssh_pwd)
+                    sftp = ssh.open_sftp()
+                    for file_name in file_names:
+                        sftp.put(dir_name + '/' + file_name, top_dir_name + file_name)
+                    exit()
+                else:
+                    if save_info[3] > 1:
+                        np.save(dir_name +'/images' + str(save_info[2]) + '.npy', images[-1], allow_pickle=True)
+                    images = []
 
 if __name__ == '__main__':
     p,q = Pipe()
