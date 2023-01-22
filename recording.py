@@ -1,5 +1,7 @@
-#test if images correspond to the point by making it skip between two points far left and and center (difference between extreme
-# and center is obvious), save only last image
+"""
+Sending files to MLserver not working properly, it skips some files
+Probably just need to let script finish after quiting recording, till it prints DONE
+"""
 
 from multiprocessing import Process, Pipe
 import time
@@ -57,7 +59,7 @@ def screen(child_conn):
 def video(parent_conn):
     pygame.init()
     pygame.camera.init()
-    cam = pygame.camera.Camera("/dev/video3", (640, 480))
+    cam = pygame.camera.Camera("/dev/video1", (640, 480))
     cam.start()
     images = []
 
@@ -73,6 +75,7 @@ def video(parent_conn):
                     sftp = ssh.open_sftp()
                     for file_name in file_names:
                         sftp.put(dir_name + '/' + file_name, top_dir_name + file_name)
+                    print("DONE")
                     exit()
                 else:
                     if save_info[3] > 1:
