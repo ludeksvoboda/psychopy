@@ -31,7 +31,7 @@ mycursor = mydb.cursor()
 def screen(child_conn):
     monitor = monitors.Monitor("myMonitor", width=62.0, distance=67.0)
     monitor.setSizePix([1920, 1080])
-    win = visual.Window([1920, 1080], monitor=monitor, units="deg", screen=0, fullscr=True)
+    win = visual.Window([1920, 1080], monitor=monitor, units="deg", screen=0, fullscr=True, color=(-1, -1, -1))
     circle = visual.Circle(win, units="pix", edges=32, radius=8, fillColor='yellow')
     max = (960, 540)
     i = 1
