@@ -21,7 +21,7 @@ dir_name = top_dir_name + str(run_no)
 os.makedirs(dir_name)
 
 mydb = mysql.connector.connect(
-            host="10.0.0.114",
+            host="10.0.0.21",
             user="ludek",
             passwd=config.db_pwd
         )
