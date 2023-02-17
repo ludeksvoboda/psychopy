@@ -1,8 +1,3 @@
-"""
-Sending files to MLserver not working properly, it skips some files
-Probably just need to let script finish after quiting recording, till it prints DONE
-"""
-
 from multiprocessing import Process, Pipe
 import time
 from psychopy import monitors, visual, event, core
