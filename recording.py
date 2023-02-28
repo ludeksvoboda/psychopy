@@ -9,6 +9,8 @@ import config
 import numpy as np
 import os
 import paramiko
+import datetime
+import time
 
 top_dir_name = '/home/lu/MLData/psychopyEyeClick/'
 run_no = len(os.listdir(top_dir_name))
@@ -39,10 +41,11 @@ def screen(child_conn):
         win.flip(clearBuffer=True)
         time.sleep(1.5)
         if i > 1:
-            query = "INSERT INTO eye_click_psychopy.data(x , y) " \
-                    "VALUES (%(x)s, %(y)s)"
-            mycursor.execute(query, {"x": x, "y": y})
-            mydb.commit()
+            ts = time.time()
+            timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+            query = "INSERT INTO eye_click_psychopy.data(x , y, time_of_recording) " \
+                                "VALUES (%(x)s, %(y)s, %(timestamp)s)"
+            mycursor.execute(query, {"x": x, "y": y, "timestamp": timestamp})
             child_conn.send([x, y, mycursor.lastrowid, i])
         else:
             child_conn.send([0, 0, 0, i])
