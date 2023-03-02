@@ -46,6 +46,7 @@ def screen(child_conn):
             query = "INSERT INTO eye_click_psychopy.data(x , y, time_of_recording) " \
                                 "VALUES (%(x)s, %(y)s, %(timestamp)s)"
             mycursor.execute(query, {"x": x, "y": y, "timestamp": timestamp})
+            mydb.commit()
             child_conn.send([x, y, mycursor.lastrowid, i])
         else:
             child_conn.send([0, 0, 0, i])
