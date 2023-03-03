@@ -61,7 +61,7 @@ def video(parent_conn):
     cam = pygame.camera.Camera("/dev/video1", (640, 480))
     cam.start()
     images = []
-
+    image_count = 0
     while(True):
         images.append(pygame.surfarray.array3d(cam.get_image()).swapaxes(0,1))
         if parent_conn.poll():
@@ -73,8 +73,10 @@ def video(parent_conn):
                     ssh.connect(config.server, username=config.ssh_username, password=config.ssh_pwd)
                     sftp = ssh.open_sftp()
                     for file_name in file_names:
+                        image_count += 1
                         sftp.put(dir_name + '/' + file_name, top_dir_name + file_name)
                     print("DONE")
+                    print(image_count)
                     exit()
                 else:
                     if save_info[3] > 1:
