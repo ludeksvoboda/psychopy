@@ -39,7 +39,7 @@ def screen(child_conn):
         circle.pos = (x,y)
         circle.draw()
         win.flip(clearBuffer=True)
-        time.sleep(1.5)
+        time.sleep(2.5)
         if i > 1:
             ts = time.time()
             timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
